@@ -1,1 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Simple Smart Contract Interaction</title>
+  <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
+</head>
+<body style="font-family: sans-serif; margin: 40px;">
+  <h2>Smart Contract Interaction</h2>
+  
+  <button id="connectButton">🔗 Connect to MetaMask</button>
+  <p id="account"></p>
 
+  <hr>
+  <h3>Current Value: <span id="value">?</span></h3>
+  <button id="readButton">📖 Read Value</button>
+  <button id="incrementButton">➕ Increment Value</button>
+  <p id="status"></p>
+
+  <script>
+    const CONTRACT_ADDRESS = "0x31EA4204E8D104d07dcAab56ee3ce75E4710495f";
+    const ABI = [
+      { "inputs": [], "name": "decrement", "outputs": [], "stateMutability": "nonpayable", "type": "function" },
+      { "inputs": [], "name": "increment", "outputs": [], "stateMutability": "nonpayable", "type": "function" },
+      { "inputs": [], "name": "get", "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }], "stateMutability": "view", "type": "function" }
+    ];
+
+    let provider, signer, contract;
+
+    const connectButton = document.getElementById('connectButton');
+    const readButton = document.getElementById('readButton');
+    const incrementButton = document.getElementById('incrementButton');
+    const accountDisplay = document.getElementById('account');
+    const valueDisplay = document.getElementById('value');
+    const statusDisplay = document.getElementById('status');
+
+    // 🦊 Connect to MetaMask
+    connectButton.onclick = async () => {
+      if (typeof window.ethereum !== 'undefined') {
+        try {
+          await ethereum.request({ method: 'eth_requestAccounts' });
+          provider = new ethers.providers.Web3Provider(window.ethereum);
+          signer = provider.getSigner();
+          const account = await signer.getAddress();
+          accountDisplay.innerText = `Connected account: ${account}`;
+          contract = new ethers.Contract(CONTRACT_ADDRESS, ABI, signer);
+          statusDisplay.innerText = "✅ Connected to MetaMask!";
+        } catch (err) {
+          statusDisplay.innerText = "❌ Connection failed.";
+          console.error(err);
+        }
+      } else {
+        alert("Please install MetaMask!");
+      }
+    };
+
+    // 📖 Read value
+    readButton.onclick = async () => {
+      if (!contract) return alert("Connect MetaMask first!");
+      try {
+        const value = await contract.get();
+        valueDisplay.innerText = value.toString();
+        statusDisplay.innerText = "✅ Value read successfully.";
+      } catch (err) {
+        console.error(err);
+        statusDisplay.innerText = "❌ Error reading value.";
+      }
+    };
+
+    // ➕ Increment value
+    incrementButton.onclick = async () => {
+      if (!contract) return alert("Connect MetaMask first!");
+      try {
+        const tx = await contract.increment();
+        statusDisplay.innerText = "⏳ Waiting for transaction confirmation...";
+        await tx.wait();
+        statusDisplay.innerText = `✅ Transaction successful! Tx Hash: ${tx.hash}`;
+        const newValue = await contract.get();
+        valueDisplay.innerText = newValue.toString();
+      } catch (err) {
+        console.error(err);
+        statusDisplay.innerText = "❌ Transaction failed.";
+      }
+    };
+  </script>
+</body>
+</html>
