@@ -17,14 +17,38 @@
   <button id="readButton">📖 Read Value</button>
   <button id="incrementButton">➕ Increment Value</button>
   <p id="status"></p>
-
+  
   <script>
     const CONTRACT_ADDRESS = "0x31EA4204E8D104d07dcAab56ee3ce75E4710495f";
     const ABI = [
-      { "inputs": [], "name": "decrement", "outputs": [], "stateMutability": "nonpayable", "type": "function" },
-      { "inputs": [], "name": "increment", "outputs": [], "stateMutability": "nonpayable", "type": "function" },
-      { "inputs": [], "name": "get", "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }], "stateMutability": "view", "type": "function" }
-    ];
+	{
+		"inputs": [],
+		"name": "decrement",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "get",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "increment",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	}
+];
 
     let provider, signer, contract;
 
